@@ -1,0 +1,71 @@
+---
+- hosts: localhost
+  become: true
+
+  vars: 
+    aem_port: 4502
+    install_directory: "/opt/aem"
+
+  tasks:
+
+  - name: Create install directory
+    file:
+      path: "{{ item }}"
+      state: directory
+    with_items:
+      - "{{ install_directory }}"
+      - "{{ install_directory }}/tmp"
+
+
+  - name: Copy quickstart JAR to install directory
+    copy:
+      src: /root/cq-quickstart-6.5.0.jar
+      dest: "{{ install_directory }}/"
+      remote_src: true
+
+
+  - name: Copy license file to install directory
+    copy:
+      src: /root/license.properties
+      dest: "{{ install_directory }}/"
+      remote_src: true
+  
+  - name: Create symlink for AEM JAR
+    file: 
+      src: "{{ install_directory }}/cq-quickstart-6.5.0.jar"
+      dest: "{{ install_directory }}/aem.jar"
+      state: link
+    register: aem_jar
+
+  - name: Launch AEM
+    shell: | 
+        java \
+          -Xmx4096M \
+          -Djava.awt.headless=true \
+          -jar {{ aem_jar.dest }} \
+          -nobrowser \
+          -nointeractive \
+          -p {{ aem_port }} \
+          -Djava.io.tmpdir="{{ install_directory }}/tmp" \
+          -Dsling.run.modes={{ aem_mode }},{{ aem_environment }},nosamplecontent &
+    args:
+      chdir: "{{ install_directory }}"
+    async: 45
+    poll: 0
+
+  - name: Wait until the instance is started
+    wait_for:
+      port: "{{ aem_port }}"
+
+  - name: Wait until the installation is complete
+    uri:
+      url: "http://localhost:{{ aem_port }}/libs/granite/core/content/login.html"
+      status_code: 200
+    register: result
+    until: result.status == 200
+    retries: 60
+    delay: 10
+
+  - name: Stop instance
+    command: |
+      bash {{ install_directory }}/crx-quickstart/bin/stop

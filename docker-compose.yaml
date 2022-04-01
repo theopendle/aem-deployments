@@ -17,6 +17,7 @@ services:
       - "6880:8080"
       - "6080:80"
       - "6443:443"
+      - "64502:4502"
     volumes:
       - ./artifacts:/artifacts
     privileged: true
