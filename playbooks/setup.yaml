@@ -1,10 +1,31 @@
 ---
-- hosts: all
-  become: true
+- hosts: localhost
+  vars:
+    containers:
+      - name: author
+        ssh_port: 6010
+      - name: publish
+        ssh_port: 6011
+  tasks:
+  - name: Create SSH aliases
+    blockinfile:
+      path: "/home/{{ ansible_user_id }}/.ssh/config"
+      marker: "# {mark} ANSIBLE MANAGED BLOCK"
+      block: |
+        {% for item in containers %}
+        Host {{ item.name }}
+          HostName 127.0.0.1
+          Port {{ item.ssh_port }}
+        
+        {% endfor %}
+    
+
+- hosts: authors
   vars_files:
-    - vars.yaml
+    - vars/default.yaml
   tasks:
   - include_tasks: "{{ item }}"
     with_items:
-    - install_aem.yaml
-    - update_aem.yaml
+    - tasks/install_aem.yaml
+    - tasks/update_aem.yaml
+  

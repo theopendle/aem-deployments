@@ -1,4 +1,5 @@
 ---
+aem_environment: prd
 aem_install_dir: "/opt/aem"
 aem_port: 4502
 aem_secure_port: 443

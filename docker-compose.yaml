@@ -6,19 +6,40 @@ networks:
 
 services:
 
-  ansible-target:
-    image: ansible-target
-    build: ansible-target
-    container_name: ansible-target
+  author:
+    image: ansible-base
+    build: ansible-base
+    container_name: author
     networks:
       - playground
     ports:
-      - "6022:22"
-      - "6880:8080"
-      - "6080:80"
-      - "6443:443"
-      - "64502:4502"
-    volumes:
-      - ./artifacts:/artifacts
+      - "6010:22"
+      - "6020:443"
+      - "6030:4502"
     privileged: true
-    hostname: ansible-target
+    hostname: author
+
+  publish:
+    image: ansible-base
+    build: ansible-base
+    container_name: publish
+    networks:
+      - playground
+    ports:
+      - "6011:22"
+      - "6021:443"
+      - "6031:4502"
+    privileged: true
+    hostname: publish
+
+  dispatcher:
+    image: ansible-base
+    build: ansible-base
+    container_name: dispatcher
+    networks:
+      - playground
+    ports:
+      - "6012:22"
+      - "6022:443"
+    privileged: true
+    hostname: dispatcher
