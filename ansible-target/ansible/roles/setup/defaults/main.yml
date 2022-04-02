@@ -1,0 +1,3 @@
+---
+aem_install_dir: "/opt/aem"
+aem_port: 4502

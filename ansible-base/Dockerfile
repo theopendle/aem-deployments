@@ -10,7 +10,7 @@ RUN echo "root:root" | chpasswd && \
     yum -y clean all
 
 # Install tooling
-RUN yum -y install sudo which nano curl && \
+RUN yum -y install sudo which nano curl tree && \
     yum -y clean all
 
 # Create ansible user

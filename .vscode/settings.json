@@ -1,0 +1,10 @@
+{
+    "launch": {
+
+        "configurations": [],
+        "compounds": []
+    },
+    "[ansible]": {
+        "editor.tabSize": 2
+    }
+}

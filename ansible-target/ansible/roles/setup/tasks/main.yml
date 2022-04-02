@@ -1,0 +1,6 @@
+---
+- name: Include tasks
+  include_tasks: "{{ item }}"
+  with_items:
+    - install_aem.yaml
+    - kill_aem.yaml
