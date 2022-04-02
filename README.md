@@ -18,7 +18,7 @@ docker build ansible-base -t ansible-base && docker-compose kill; docker-compose
 
 ### Create SSH aliases for the containers
 
-In order to connect to the containers via SSH (asnible requires this), you must first create an alias, like so:
+In order to connect to the containers via SSH (ansible requires this), you must first create an alias, like so:
 
 ```bash
 echo "

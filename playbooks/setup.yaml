@@ -1,0 +1,10 @@
+---
+- hosts: all
+  become: true
+  vars_files:
+    - vars.yaml
+  tasks:
+  - include_tasks: "{{ item }}"
+    with_items:
+    - install_aem.yaml
+    - update_aem.yaml

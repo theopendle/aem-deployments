@@ -1,0 +1,25 @@
+---
+- hosts: all
+  become: true
+  vars_files:
+    - vars.yaml
+
+  tasks:
+    - name: Start AEM
+      command: bash {{ aem_install_dir }}/crx-quickstart/bin/start
+      async: 45
+      poll: 0
+
+    - name: Wait until the instance is started
+      wait_for:
+        port: "{{ aem_port }}"
+        state: started
+
+    - name: Wait until the startup is complete
+      uri:
+        url: "http://localhost:{{ aem_port }}/libs/granite/core/content/login.html"
+        status_code: 200
+      register: result
+      until: result.status == 200
+      retries: 60
+      delay: 10

@@ -1,0 +1,6 @@
+---
+aem_install_dir: "/opt/aem"
+aem_port: 4502
+aem_secure_port: 443
+aem_sp_version: 12
+aem_admin_password: admin

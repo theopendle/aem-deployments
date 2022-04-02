@@ -1,4 +1,9 @@
 ---
+- name: Install Java
+  yum:
+    name: java-11-openjdk
+    state: present
+
 - name: Create install directory
   file:
     path: "{{ item }}"
@@ -52,7 +57,3 @@
   until: result.status == 200
   retries: 60
   delay: 10
-
-- name: Stop instance
-  command: |
-    bash {{ aem_install_dir }}/crx-quickstart/bin/stop
