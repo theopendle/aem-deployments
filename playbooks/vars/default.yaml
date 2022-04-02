@@ -5,3 +5,7 @@ aem_port: 4502
 aem_secure_port: 443
 aem_sp_version: 12
 aem_admin_password: admin
+
+ssl_ca_password: ca123
+ssl_dir: /tmp/aem-ssl
+ssl_ca_dir: /usr/local/share/ca-certificates

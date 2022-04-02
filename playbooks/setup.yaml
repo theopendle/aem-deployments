@@ -1,5 +1,8 @@
 ---
 - hosts: localhost
+  become: true
+  vars_files:
+    - vars/default.yaml
   vars:
     containers:
       - name: author
@@ -18,14 +21,41 @@
           Port {{ item.ssh_port }}
         
         {% endfor %}
-    
 
-- hosts: authors
-  vars_files:
-    - vars/default.yaml
-  tasks:
-  - include_tasks: "{{ item }}"
-    with_items:
-    - tasks/install_aem.yaml
-    - tasks/update_aem.yaml
+  - name: Create SSL dir
+    file:
+      path: "{{ ssl_dir }}"
+      state: directory
+    register: ssl_dir
+
+  - name: Generate CA key
+    command: openssl genrsa -des3 -passout pass:{{ ssl_ca_password }} -out ca.key 2048
+    args:
+      chdir: "{{ ssl_dir.path }}"
+
+  - name: Generate CA root certificate
+    command: openssl req -x509 -new -nodes -key ca.key -sha256 -days 1825 -passin pass:{{ ssl_ca_password }} -out ca.pem -subj "/C=LU/ST=Luxembourg/L=Betrange/O=theopendle/CN=aem-ca"
+    args:
+      chdir: "{{ ssl_dir.path }}"
+  
+  - name: Copy CA to trusted certs directory
+    copy:
+      remote_src: true
+      src: "{{ ssl_dir.path }}"
+      dest: "{{ ssl_ca_dir }}"
+
+  - name: Update truststore
+    command: update-ca-certificates
+
+  - include_tasks: tasks/generate_crypto_objects.yaml
+    with_items: "{{ groups['all'] }}"
+
+# - hosts: authors
+#   vars_files:
+#     - vars/default.yaml
+#   tasks:
+#   - include_tasks: "{{ item }}"
+#     with_items:
+#     - tasks/install_aem.yaml
+#     - tasks/update_aem.yaml
   
