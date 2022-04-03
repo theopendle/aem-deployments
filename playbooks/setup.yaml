@@ -28,12 +28,7 @@
       loop_control:
         loop_var: host
 
-    - include_tasks: tasks/create_ca_crypto_objects.yaml
-
-    - include_tasks: tasks/create_container_crypto_objects.yaml
-      loop: "{{ groups['aem'] }}"
-      loop_control:
-        loop_var: host
+    - include_tasks: tasks/create_crypto_objects.yaml
 
 - hosts: author
   vars_files:

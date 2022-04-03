@@ -7,5 +7,6 @@ aem_sp_version: 12
 aem_admin_password: admin
 
 ssl_ca_password: ca123
-ssl_dir: /tmp/aem-ssl
+ssl_temp_dir: /tmp/aem-ssl
 ssl_ca_dir: /usr/local/share/ca-certificates
+ssl_ca_name: aem-ca
