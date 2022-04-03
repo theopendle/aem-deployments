@@ -2,7 +2,7 @@
 - hosts: all
   become: true
   vars_files:
-    - vars.yaml
+    - vars/default.yaml
 
   tasks:
     - name: Start AEM

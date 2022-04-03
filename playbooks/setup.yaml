@@ -25,12 +25,12 @@
 
     - include_tasks: tasks/create_container_certificates.yaml
 
-# - hosts: authors
-#   vars_files:
-#     - vars/default.yaml
-#   tasks:
-#   - include_tasks: "{{ item }}"
-#     with_items:
+- hosts: authors
+  vars_files:
+    - vars/default.yaml
+  tasks:
+  - include_tasks: "{{ item }}"
+    with_items:
 #     - tasks/install_aem.yaml
 #     - tasks/update_aem.yaml
   
