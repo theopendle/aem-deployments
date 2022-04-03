@@ -13,3 +13,16 @@
   command: openssl pkcs8 -topk8 -inform PEM -in {{ item.name }}.key -outform DER -out {{ item.name }}.der -nocrypt
   args:
     chdir: "{{ ssl_dir.path }}"
+
+- name: Create certificate
+  command: openssl x509 -req -in {{ item.name }}.csr -CA ca.pem -CAkey ca.key -CAcreateserial -out {{ item.name }}.crt -days 825 -sha256 -passin pass:ca123
+  args:
+    chdir: "{{ ssl_dir.path }}"
+
+- name: Copy objects to container
+  shell: |
+    sshpass -p 'root' scp -o StrictHostKeyChecking=no {{ item.name }}.key root@{{ item.name }}:/etc/pki/tls/private/
+    sshpass -p 'root' scp -o StrictHostKeyChecking=no {{ item.name }}.der root@{{ item.name }}:/etc/pki/tls/private/
+    sshpass -p 'root' scp -o StrictHostKeyChecking=no {{ item.name }}.crt root@{{ item.name }}:/etc/pki/tls/certs/
+  args:
+    chdir: "{{ ssl_dir.path }}"

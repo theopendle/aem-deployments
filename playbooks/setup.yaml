@@ -1,6 +1,5 @@
 ---
 - hosts: localhost
-  become: true
   vars_files:
     - vars/default.yaml
   vars:
@@ -9,46 +8,22 @@
         ssh_port: 6010
       - name: publish
         ssh_port: 6011
+      - name: disptacher
+        ssh_port: 6012
   tasks:
-  - name: Create SSH aliases
-    blockinfile:
-      path: "/home/{{ ansible_user_id }}/.ssh/config"
-      marker: "# {mark} ANSIBLE MANAGED BLOCK"
-      block: |
-        {% for item in containers %}
-        Host {{ item.name }}
-          HostName 127.0.0.1
-          Port {{ item.ssh_port }}
-        
-        {% endfor %}
+    - name: Create SSH aliases
+      blockinfile:
+        path: "/home/{{ ansible_user_id }}/.ssh/config"
+        marker: "# {mark} ANSIBLE MANAGED BLOCK"
+        block: |
+          {% for item in containers %}
+          Host {{ item.name }}
+            HostName 127.0.0.1
+            Port {{ item.ssh_port }}
+          
+          {% endfor %}
 
-  - name: Create SSL dir
-    file:
-      path: "{{ ssl_dir }}"
-      state: directory
-    register: ssl_dir
-
-  - name: Generate CA key
-    command: openssl genrsa -des3 -passout pass:{{ ssl_ca_password }} -out ca.key 2048
-    args:
-      chdir: "{{ ssl_dir.path }}"
-
-  - name: Generate CA root certificate
-    command: openssl req -x509 -new -nodes -key ca.key -sha256 -days 1825 -passin pass:{{ ssl_ca_password }} -out ca.pem -subj "/C=LU/ST=Luxembourg/L=Betrange/O=theopendle/CN=aem-ca"
-    args:
-      chdir: "{{ ssl_dir.path }}"
-  
-  - name: Copy CA to trusted certs directory
-    copy:
-      remote_src: true
-      src: "{{ ssl_dir.path }}"
-      dest: "{{ ssl_ca_dir }}"
-
-  - name: Update truststore
-    command: update-ca-certificates
-
-  - include_tasks: tasks/generate_crypto_objects.yaml
-    with_items: "{{ groups['all'] }}"
+    - include_tasks: tasks/create_container_certificates.yaml
 
 # - hosts: authors
 #   vars_files:
