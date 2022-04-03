@@ -15,8 +15,13 @@
   args:
     chdir: "{{ ssl_dir.path }}"
 
+- name: Create extfile
+  template:
+    src: ../templates/extfile.ext.j2
+    dest: "{{ ssl_dir.path }}/extfile-{{ host }}.ext"
+
 - name: Create certificate
-  command: openssl x509 -req -in {{ host }}.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out {{ host }}.crt -days 825 -sha256 -passin pass:ca123
+  command: openssl x509 -req -in {{ host }}.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out {{ host }}.crt -days 825 -sha256 -passin pass:ca123 -extfile extfile-{{ host }}.ext
   args:
     chdir: "{{ ssl_dir.path }}"
 
