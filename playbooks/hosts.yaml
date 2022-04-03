@@ -8,16 +8,16 @@ all:
               ansible_port: 6010
               ansible_user: root
               ansible_password: root
-              vars:
-                aem_mode: author
+          vars:
+            aem_mode: author
         publish:
           hosts:
             publish1:
               ansible_port: 6011
               ansible_user: root
               ansible_password: root
-              vars:
-                aem_mode: publish
+          vars:
+            aem_mode: publish
         dispatcher:
           hosts:
             dispatcher1:

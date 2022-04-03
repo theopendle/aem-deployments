@@ -5,18 +5,18 @@
   args:
     chdir: "{{ ssl_dir.path }}"
 
-- name: Generate CSR
-  command: openssl req -new -key {{ host }}.key -out {{ host }}.csr -subj "/C=LU/ST=Luxembourg/L=Betrange/O=theopendle/CN=aem-ca"
-  args:
-    chdir: "{{ ssl_dir.path }}"
-
 - name: Convert key to DER
   command: openssl pkcs8 -topk8 -inform PEM -in {{ host }}.key -outform DER -out {{ host }}.der -nocrypt
   args:
     chdir: "{{ ssl_dir.path }}"
 
+- name: Generate CSR
+  command: openssl req -new -key {{ host }}.key -out {{ host }}.csr -subj "/C=LU/ST=Luxembourg/L=Betrange/O=theopendle/CN={{ host }}.aem.deployment"
+  args:
+    chdir: "{{ ssl_dir.path }}"
+
 - name: Create certificate
-  command: openssl x509 -req -in {{ host }}.csr -CA ca.pem -CAkey ca.key -CAcreateserial -out {{ host }}.crt -days 825 -sha256 -passin pass:ca123
+  command: openssl x509 -req -in {{ host }}.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out {{ host }}.crt -days 825 -sha256 -passin pass:ca123
   args:
     chdir: "{{ ssl_dir.path }}"
 

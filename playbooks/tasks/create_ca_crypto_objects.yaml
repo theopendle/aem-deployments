@@ -11,7 +11,7 @@
     chdir: "{{ ssl_dir.path }}"
 
 - name: Generate CA root certificate
-  command: openssl req -x509 -new -nodes -key ca.key -sha256 -days 1825 -passin pass:{{ ssl_ca_password }} -out ca.pem -subj "/C=LU/ST=Luxembourg/L=Betrange/O=theopendle/CN=aem-ca"
+  command: openssl req -x509 -new -nodes -key ca.key -sha256 -days 1825 -passin pass:{{ ssl_ca_password }} -out ca.crt -subj "/C=LU/ST=Luxembourg/L=Betrange/O=theopendle/CN=aem-ca"
   args:
     chdir: "{{ ssl_dir.path }}"
 
@@ -19,14 +19,9 @@
   become: true
   copy:
     remote_src: true
-    src: "{{ ssl_dir.path }}"
+    src: "{{ ssl_dir.path }}/ca.crt"
     dest: "{{ ssl_ca_dir }}"
 
 - name: Update truststore
   become: true
   command: update-ca-certificates
-
-- include_tasks: generate_crypto_objects.yaml
-  loop: "{{ groups['aem'] }}"
-  loop_control:
-    loop_var: host
