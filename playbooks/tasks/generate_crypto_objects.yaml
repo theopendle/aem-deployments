@@ -1,28 +1,29 @@
 ---
+
 - name: Generate private key
-  command: openssl genrsa -out {{ item.name }}.key 2048
+  command: openssl genrsa -out {{ host }}.key 2048
   args:
     chdir: "{{ ssl_dir.path }}"
 
 - name: Generate CSR
-  command: openssl req -new -key {{ item.name }}.key -out {{ item.name }}.csr -subj "/C=LU/ST=Luxembourg/L=Betrange/O=theopendle/CN=aem-ca"
+  command: openssl req -new -key {{ host }}.key -out {{ host }}.csr -subj "/C=LU/ST=Luxembourg/L=Betrange/O=theopendle/CN=aem-ca"
   args:
     chdir: "{{ ssl_dir.path }}"
 
 - name: Convert key to DER
-  command: openssl pkcs8 -topk8 -inform PEM -in {{ item.name }}.key -outform DER -out {{ item.name }}.der -nocrypt
+  command: openssl pkcs8 -topk8 -inform PEM -in {{ host }}.key -outform DER -out {{ host }}.der -nocrypt
   args:
     chdir: "{{ ssl_dir.path }}"
 
 - name: Create certificate
-  command: openssl x509 -req -in {{ item.name }}.csr -CA ca.pem -CAkey ca.key -CAcreateserial -out {{ item.name }}.crt -days 825 -sha256 -passin pass:ca123
+  command: openssl x509 -req -in {{ host }}.csr -CA ca.pem -CAkey ca.key -CAcreateserial -out {{ host }}.crt -days 825 -sha256 -passin pass:ca123
   args:
     chdir: "{{ ssl_dir.path }}"
 
 - name: Copy objects to container
   shell: |
-    sshpass -p 'root' scp -o StrictHostKeyChecking=no {{ item.name }}.key root@{{ item.name }}:/etc/pki/tls/private/
-    sshpass -p 'root' scp -o StrictHostKeyChecking=no {{ item.name }}.der root@{{ item.name }}:/etc/pki/tls/private/
-    sshpass -p 'root' scp -o StrictHostKeyChecking=no {{ item.name }}.crt root@{{ item.name }}:/etc/pki/tls/certs/
+    sshpass -p 'root' scp -o StrictHostKeyChecking=no {{ host }}.key root@{{ host }}:/etc/pki/tls/private/aem.key
+    sshpass -p 'root' scp -o StrictHostKeyChecking=no {{ host }}.der root@{{ host }}:/etc/pki/tls/private/aem.der
+    sshpass -p 'root' scp -o StrictHostKeyChecking=no {{ host }}.crt root@{{ host }}:/etc/pki/tls/certs/aem.crt
   args:
     chdir: "{{ ssl_dir.path }}"

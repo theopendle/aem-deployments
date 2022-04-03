@@ -6,10 +6,10 @@ networks:
 
 services:
 
-  author:
+  author1:
     image: ansible-base
     build: ansible-base
-    container_name: author
+    container_name: author1
     networks:
       - playground
     ports:
@@ -17,12 +17,12 @@ services:
       - "6020:443"
       - "6030:4502"
     privileged: true
-    hostname: author
+    hostname: author1
 
-  publish:
+  publish1:
     image: ansible-base
     build: ansible-base
-    container_name: publish
+    container_name: publish1
     networks:
       - playground
     ports:
@@ -30,16 +30,16 @@ services:
       - "6021:443"
       - "6031:4502"
     privileged: true
-    hostname: publish
+    hostname: publish1
 
-  dispatcher:
+  dispatcher1:
     image: ansible-base
     build: ansible-base
-    container_name: dispatcher
+    container_name: dispatcher1
     networks:
       - playground
     ports:
       - "6012:22"
       - "6022:443"
     privileged: true
-    hostname: dispatcher
+    hostname: dispatcher1

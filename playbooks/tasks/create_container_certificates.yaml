@@ -27,4 +27,6 @@
   command: update-ca-certificates
 
 - include_tasks: generate_crypto_objects.yaml
-  with_items: "{{ containers }}"
+  loop: "{{ groups['aem'] }}"
+  loop_control:
+    loop_var: host
