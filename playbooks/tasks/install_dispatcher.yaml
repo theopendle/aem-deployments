@@ -1,0 +1,45 @@
+---
+- name: Install packages
+  yum:
+    name:
+    - httpd
+    - mod_ssl
+    state: present
+
+- name: Copy dispatcher TAR to tmp directory
+  copy:
+    src: "{{ dispatcher_archive_name }}"
+    dest: "/tmp/"
+  register: tar
+
+- name: Create temp directory
+  file:
+    path: /tmp/dispatcher
+    state: directory
+  register: tmp_dir
+
+- name: Unpack dispatcher TAR
+  unarchive:
+    remote_src: true
+    src: "{{ tar.dest }}"
+    dest: "{{ tmp_dir.path }}/"
+    list_files: true
+  register: unpacked
+
+- name: Copy dispatcher SO to modules directory
+  copy:
+    remote_src: true
+    src: "{{ tmp_dir.path }}/{{ unpacked.files | select('match', '.+\\.so') | list | first }}"
+    dest: "/etc/httpd/modules/"
+  register: module
+
+- name: Set permissions on dispatcher SO
+  file:
+    path: "{{ module.dest }}"
+    mode: 755
+
+- name: Deactivate default HTTP port
+  replace: 
+    path: /etc/httpd/conf/httpd.conf 
+    regexp: '^Listen 80'
+    replace: '#Listen 80'
