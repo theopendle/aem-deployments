@@ -2,6 +2,8 @@
 - hosts: localhost
   vars_files:
     - vars/default.yaml
+  tags:
+    - ssl
   tasks:
     - name: Create SSH aliases
       blockinfile:
@@ -36,7 +38,20 @@
   tasks:
   - include_tasks: "{{ item }}"
     with_items: 
-    # - tasks/install_aem.yaml
-    # - tasks/update_aem.yaml
+    - tasks/install_aem.yaml
+    - tasks/update_aem.yaml
     - tasks/configure_aem.yaml
+  tags:
+    - author
+
+
+- hosts: dispatcher
+  vars_files:
+    - vars/default.yaml
+  tasks:
+  - include_tasks: "{{ item }}"
+    with_items: 
+    - tasks/install_dispatcher.yaml
+  tags:
+    - dispatcher
   

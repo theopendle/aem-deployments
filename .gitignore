@@ -1,4 +1,2 @@
 artifacts/
-cq-quickstart*
-license*
-aem-service-pkg*
+playbooks/files/
