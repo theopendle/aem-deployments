@@ -43,7 +43,7 @@ Due to the proprietary nature of the AEM platform, the fully configured instance
     * The latest AEM Service Pack from the [Adobe Software Distribution website](https://experience.adobe.com/#/downloads/content/software-distribution/en/aem.html)(eg: `aem-service-pkg-6.5.12.0.zip`)
     * The dispatcher module TAR from the [Dispatcher download page](https://experienceleague.adobe.com/docs/experience-manager-dispatcher/using/getting-started/release-notes.html?lang=en#downloads) (eg: `dispatcher-apache2.4-linux-x86_64-ssl1.1-4.3.5.tar.gz`)
 
-3. Copy your license.properties file in the `ansible/files` folder
+3. Copy your `license.properties` file in the `ansible/files` folder
 
 4. Build the container image(s) and run the containers using the following command:
     ```bash
