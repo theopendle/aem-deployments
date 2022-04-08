@@ -56,4 +56,4 @@ Due to the proprietary nature of the AEM platform, the fully configured instance
     ```bash
     ansible-playbook ansible/setup.yaml -v -i ansible/hosts.yaml
     ```
-    > :info: **Takes a bit of time**: Since the playbook is responsible for setting up the entire AEM deployment and config, it is normal for it to run for a few minutes, depending on your machine specs.
+    > :warning: **Takes a bit of time**: Since the playbook is responsible for setting up the entire AEM deployment and config, it is normal for it to run for a few minutes, depending on your machine specs.
