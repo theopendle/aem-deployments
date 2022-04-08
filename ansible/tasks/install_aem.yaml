@@ -14,12 +14,12 @@
 
 - name: Copy quickstart JAR to install directory
   copy:
-    src: cq-quickstart-6.5.0.jar
+    src: proprietary/cq-quickstart-6.5.0.jar
     dest: "{{ aem_install_dir }}/"
 
 - name: Copy license file to install directory
   copy:
-    src: license.properties
+    src: proprietary/license.properties
     dest: "{{ aem_install_dir }}/"
 
 - name: Create symlink for AEM JAR

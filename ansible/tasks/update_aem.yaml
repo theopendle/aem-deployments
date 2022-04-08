@@ -15,7 +15,7 @@
 
   - name: Copy SP to install directory
     copy:
-      src: aem-service-pkg-6.5.{{ aem_sp_version }}.0.zip
+      src: proprietary/aem-service-pkg-6.5.{{ aem_sp_version }}.0.zip
       dest: "{{ aem_install_dir }}/"
     register: sp
 

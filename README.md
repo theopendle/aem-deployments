@@ -38,7 +38,7 @@ Due to the proprietary nature of the AEM platform, the fully configured instance
     * [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
     * [Docker](https://docs.docker.com/get-docker/)
 
-2. Download the following Adobe software and place them in the `ansible/files` folder:
+2. Download the following Adobe software and place them in the `ansible/files/proprietary` folder:
     * The cq-quickstart JAR from the [Adobe Software Distribution website](https://experience.adobe.com/#/downloads/content/software-distribution/en/aem.html) (eg: `cq-quickstart-6.5.0.jar`)
     * The latest AEM Service Pack from the [Adobe Software Distribution website](https://experience.adobe.com/#/downloads/content/software-distribution/en/aem.html)(eg: `aem-service-pkg-6.5.12.0.zip`)
     * The dispatcher module TAR from the [Dispatcher download page](https://experienceleague.adobe.com/docs/experience-manager-dispatcher/using/getting-started/release-notes.html?lang=en#downloads) (eg: `dispatcher-apache2.4-linux-x86_64-ssl1.1-4.3.5.tar.gz`)
