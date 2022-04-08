@@ -14,16 +14,18 @@
   args:
     chdir: "{{ ssl_temp_dir }}"
 
-- name: Copy CA to trusted certs directory
+- when: ssl_update_host_ca
   become: true
-  copy:
-    remote_src: true
-    src: "{{ ssl_temp_dir }}/{{ ssl_ca_name }}.crt"
-    dest: "{{ ssl_ca_dir }}"
+  block:
 
-- name: Update truststore
-  become: true
-  command: update-ca-certificates
+  - name: Copy CA to trusted certs directory
+    copy:
+      remote_src: true
+      src: "{{ ssl_temp_dir }}/{{ ssl_ca_name }}.crt"
+      dest: "{{ ssl_ca_dir }}"
+
+  - name: Update truststore
+    command: update-ca-certificates
 
 - include_tasks: tasks/create_container_crypto_objects.yaml
   loop: "{{ groups['aem'] }}"

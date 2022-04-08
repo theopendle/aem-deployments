@@ -19,6 +19,7 @@
 
     - name: Create DNS hosts
       become: true
+      when: ssl_update_host_ca
       blockinfile:
         path: /etc/hosts
         marker: "# {mark} ANSIBLE MANAGED BLOCK"
