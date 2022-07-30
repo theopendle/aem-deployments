@@ -1,0 +1,14 @@
+---
+- name: Create user
+  user:
+    name: "{{ npa_user_name }}"
+    state: present
+
+- become: true
+  become_user: "{{ npa_user_name }}"
+  block:
+
+  - name: Set start directory
+    blockinfile:
+      path: "~/.bashrc"
+      block: "cd {{ npa_user_start_dir }}"

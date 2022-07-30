@@ -1,13 +1,21 @@
 ---
+
 - name: Install Java
   yum:
     name: java-11-openjdk
     state: present
 
+- include: create_npa.yaml
+  vars:
+    npa_user_name: aem
+    npa_user_start_dir: "{{ aem_install_dir }}"
+
 - name: Create install directory
   file:
     path: "{{ item }}"
     state: directory
+    owner: aem
+    group: aem
   with_items:
     - "{{ aem_install_dir }}"
     - "{{ aem_install_dir }}/tmp"
