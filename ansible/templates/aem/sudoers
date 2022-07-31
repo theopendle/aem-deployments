@@ -4,6 +4,6 @@ Cmnd_Alias AEM_SERVICE = \
     /bin/systemctl status aem.service, \
     /usr/bin/aem start, \
     /usr/bin/aem stop, \
-    /usr/bin/auaemthor status
+    /usr/bin/aem status
 
 aem     ALL=(root)      NOPASSWD: AEM_SERVICE

@@ -1,0 +1,9 @@
+Cmnd_Alias HTTPD_SERVICE = \
+    /bin/systemctl start httpd.service, \
+    /bin/systemctl stop httpd.service, \
+    /bin/systemctl status httpd.service, \
+    /usr/bin/httpd start, \
+    /usr/bin/httpd stop, \
+    /usr/bin/httpd status
+
+dispatcher     ALL=(root)      NOPASSWD: HTTPD_SERVICE

@@ -18,6 +18,6 @@
 
   - name: "Allow aem user to run aem service"
     template:
-      src: "../templates/aem/sudoers.j2"
+      src: "../templates/aem/sudoers"
       dest: /etc/sudoers.d/aem
       mode: '0440'

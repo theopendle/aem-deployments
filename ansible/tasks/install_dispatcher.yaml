@@ -4,13 +4,62 @@
     name:
     - httpd
     - mod_ssl
+    - unzip
     state: present
 
-- name: Copy dispatcher TAR to tmp directory
-  copy:
-    src: "{{ dispatcher_archive_name }}"
-    dest: "/tmp/"
-  register: tar
+- include_tasks: create_npa.yaml
+  vars:
+    npa_user_name: dispatcher
+    npa_user_start_dir: "/etc/httpd"
+
+- name: Find httpd directories
+  find:
+    paths: /etc/httpd
+    file_type: directory
+    recurse: true
+  register: httpd_dirs
+
+- name: Find httpd files
+  find:
+    paths: /etc/httpd
+    file_type: file
+    recurse: true
+  register: httpd_files
+
+
+- loop: "{{ httpd_dirs.files}}"
+  loop_control:
+    loop_var: file
+  debug:
+    var: file.path
+
+- name: Allow dispatcher user to administer httpd directories
+  loop: "{{ httpd_dirs.files}}"
+  loop_control:
+    loop_var: directory
+  file:
+    path: "{{ directory.path }}"
+    state: directory
+    mode: 0775
+    owner: dispatcher
+    group: dispatcher
+
+- name: Allow dispatcher user to administer httpd files
+  loop: "{{ httpd_files.files}}"
+  loop_control:
+    loop_var: file
+  file:
+    path: "{{ file.path }}"
+    state: file
+    mode: 0774
+    owner: dispatcher
+    group: dispatcher
+
+- name: "Allow dispatcher user to run httpd service"
+  template:
+    src: "../templates/dispatcher/sudoers"
+    dest: /etc/sudoers.d/dspatcher
+    mode: '0440'
 
 - name: Create temp directory
   file:
@@ -20,8 +69,7 @@
 
 - name: Unpack dispatcher TAR
   unarchive:
-    remote_src: true
-    src: "{{ tar.dest }}"
+    src: "proprietary/{{ dispatcher_archive_name }}"
     dest: "{{ tmp_dir.path }}/"
     list_files: true
   register: unpacked
@@ -30,16 +78,18 @@
   copy:
     remote_src: true
     src: "{{ tmp_dir.path }}/{{ unpacked.files | select('match', '.+\\.so') | list | first }}"
-    dest: "/etc/httpd/modules/"
+    dest: "/etc/httpd/modules/mod_dispatcher.so"
   register: module
 
 - name: Set permissions on dispatcher SO
   file:
     path: "{{ module.dest }}"
     mode: 755
+    owner: dispatcher
+    group: dispatcher
 
-- name: Deactivate default HTTP port
-  replace: 
-    path: /etc/httpd/conf/httpd.conf 
-    regexp: '^Listen 80'
-    replace: '#Listen 80'
+# - name: Deactivate default HTTP port
+#   replace: 
+#     path: /etc/httpd/conf/httpd.conf 
+#     regexp: '^Listen 80'
+#     replace: '#Listen 80'
