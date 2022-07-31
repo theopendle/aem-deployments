@@ -26,7 +26,6 @@
     recurse: true
   register: httpd_files
 
-
 - loop: "{{ httpd_dirs.files}}"
   loop_control:
     loop_var: file
@@ -88,8 +87,8 @@
     owner: dispatcher
     group: dispatcher
 
-# - name: Deactivate default HTTP port
-#   replace: 
-#     path: /etc/httpd/conf/httpd.conf 
-#     regexp: '^Listen 80'
-#     replace: '#Listen 80'
+- name: Deactivate default HTTP port
+  replace: 
+    path: /etc/httpd/conf/httpd.conf 
+    regexp: '^Listen 80'
+    replace: '#Listen 80'
