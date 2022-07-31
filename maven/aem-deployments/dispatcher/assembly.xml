@@ -10,7 +10,8 @@
         <fileSet>
             <directory>${basedir}/src</directory>
             <includes>
-                <include>**/*</include>
+                <include>%regex[.*conf.d/.*dispatcher_vhost\.conf]</include>
+                <include>%regex[.*conf.d/.*dispatcher\.any]</include>
             </includes>
             <outputDirectory></outputDirectory>
         </fileSet>
