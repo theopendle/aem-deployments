@@ -1,0 +1,11 @@
+---
+- hosts: dispatcher
+  become: true
+  vars_files:
+    - vars/default.yaml
+
+  tasks:
+    - name: Start httpd
+      service:
+        name: httpd
+        state: started

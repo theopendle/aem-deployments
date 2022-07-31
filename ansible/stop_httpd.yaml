@@ -1,0 +1,11 @@
+---
+- hosts: dispatcher
+  become: true
+  vars_files:
+    - vars/default.yaml
+
+  tasks:
+    - name: Stop httpd
+      service:
+        name: httpd
+        state: stopped

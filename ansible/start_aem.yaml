@@ -6,9 +6,9 @@
 
   tasks:
     - name: Start AEM
-      command: bash {{ aem_install_dir }}/crx-quickstart/bin/start
-      async: 45
-      poll: 0
+      service:
+        name: aem
+        state: started
 
     - name: Wait until the instance is started
       wait_for:
