@@ -1,0 +1,59 @@
+#!/bin/sh
+# This service manages the Adobe Experience Manager java process.
+
+# Set variables
+SCRIPT_NAME=`basename $0`
+AEM_ROOT='{{ aem_install_dir }}'
+AEM_USER='aem'
+JAVA_MAX_HEAP_SIZE=4096m
+
+# Define paths to AEM scripts
+BIN=${AEM_ROOT}/crx-quickstart/bin
+START=${BIN}/start
+STOP=${BIN}/stop
+STATUS=${BIN}/status
+
+# Export AEM system variables
+export CQ_RUNMODE='{{ aem_mode }},{{ aem_environment}},nosamplecontent'
+
+# Set CQ options
+export CQ_HOST="localhost"
+export CQ_PORT={{ aem_port }}
+export CQ_JVM_OPTS="-server -Xmx4096m -Djava.awt.headless=true {% if aem_debug %}-agentlib:jdwp=transport=dt_socket,address=8000{% endif %},server=y,suspend=n -Djdk.tls.ephemeralDHKeySize=2048 -Djava.io.tmpdir=${AEM_ROOT}/tmp"
+
+case "$1" in
+    start)
+        if [ -f $START ]; then
+            echo "Starting AEM {{ aem_mode }}"
+            /bin/su $AEM_USER -s /bin/bash -c $START
+            RETVAL=$?
+            [ $RETVAL -eq 0 ] && touch /var/lock/subsys/${SCRIPT_NAME}
+        fi
+    ;;
+    stop)
+        if [ -f $STOP ]; then
+            echo "Stopping AEM {{ aem_mode }}"
+            /bin/su $AEM_USER -s /bin/bash -c $STOP
+            RETVAL=$?
+            [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/${SCRIPT_NAME}
+        fi
+    ;;
+    status)
+        if [ -f $STATUS ]; then
+            /bin/su $AEM_USER -s /bin/bash -c $STATUS
+        fi
+    ;;
+    restart)
+        /bin/su $AEM_USER -s /bin/bash -c ${STOP}
+        /bin/su $AEM_USER -s /bin/bash -c ${START}
+    ;;
+    reload)
+    ;;
+    *)
+    
+echo "Usage: $SCRIPT_NAME {start|stop|status|reload}"
+RETVAL=1
+;;
+esac
+
+exit $RETVAL

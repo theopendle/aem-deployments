@@ -9,15 +9,16 @@ services:
   author1:
     image: ansible-base
     build: ansible-base
-    container_name: author1.aem.deployment
+    container_name: author1
     networks:
       - playground
     ports:
       - "6010:22"
       - "6020:443"
       - "6030:4502"
+      - "6040:8000"
     privileged: true
-    hostname: author1
+    hostname: author1.aem.deployment
 
   publish1:
     image: ansible-base
@@ -41,5 +42,6 @@ services:
     ports:
       - "6012:22"
       - "6022:443"
+      - "6032:80"
     privileged: true
     hostname: dispatcher1.aem.deployment

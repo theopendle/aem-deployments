@@ -25,7 +25,7 @@
     -F "truststorePasswordConfirm={{ aem_admin_password }}" \
     -F "privatekeyFile=@/etc/pki/tls/private/aem.der" \
     -F "certificateFile=@/etc/pki/tls/certs/aem.crt" \
-    -F "httpsHostname={{ ansible_fqdn }}.aem.deployment" \
+    -F "httpsHostname={{ ansible_fqdn }}" \
     -F "httpsPort={{ aem_secure_port }}" \
     http://localhost:{{ aem_port }}/libs/granite/security/post/sslSetup.html
   retries: 3
@@ -35,6 +35,6 @@
 
 - name: Check SSL connection
   uri:
-    url: "https://{{ ansible_fqdn }}.aem.deployment:{{ aem_secure_port }}/libs/granite/core/content/login.html"
+    url: "https://{{ ansible_fqdn }}:{{ aem_secure_port }}/libs/granite/core/content/login.html"
     status_code: 200
     validate_certs: no
