@@ -1,38 +1,5 @@
 ---
 
-- name: Disable insecure bundles
-  uri: 
-    url: http://localhost:{{ aem_port }}/system/console/bundles/{{ item }}
-    user: admin
-    password: "{{ aem_admin_password }}"
-    method: POST
-    body_format: form-urlencoded
-    return_content: true
-    status_code: 
-      - 200
-      - 201
-    body:
-      "action": stop
-  with_items:
-    - org.apache.sling.jcr.webdav
-
-- name: Unlock CRXDE
-  uri:
-    url: http://localhost:{{ aem_port }}/apps/system/config/org.apache.sling.jcr.davex.impl.servlets.SlingDavExServlet
-    user: admin
-    password: "{{ aem_admin_password }}"
-    method: POST
-    body_format: form-urlencoded
-    return_content: true
-    status_code: 
-      - 200
-      - 201
-    body:
-      "jcr:primaryType": sling:OsgiConfig
-      "alias": /crx/server
-      "dav.create-absolute-uri": true
-      "dav.create-absolute-uri@TypeHint": Boolean
-
 - name: Configure SSL
   command: |
     curl -u admin:{{ aem_admin_password }} \
@@ -55,3 +22,18 @@
     url: "https://{{ ansible_fqdn }}:{{ aem_secure_port }}/libs/granite/core/content/login.html"
     status_code: 200
     validate_certs: no
+
+- name: Disable WebDAV bundle
+  uri: 
+    url: http://localhost:{{ aem_port }}/system/console/bundles/org.apache.sling.jcr.webdav
+    user: admin
+    password: "{{ aem_admin_password }}"
+    force_basic_auth: true
+    method: POST
+    body_format: form-urlencoded
+    return_content: true
+    status_code: 
+      - 200
+      - 201
+    body:
+      action: stop

@@ -45,6 +45,18 @@
   tags:
     - author
 
+- hosts: publish
+  vars_files:
+    - vars/default.yaml
+  tasks:
+  - include_tasks: "{{ item }}"
+    with_items: 
+    - tasks/install_aem.yaml
+    - tasks/configure_aem.yaml
+    - tasks/update_aem.yaml
+  tags:
+    - publish
+
 - hosts: dispatcher
   vars_files:
     - vars/default.yaml
