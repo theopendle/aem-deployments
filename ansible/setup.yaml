@@ -40,11 +40,10 @@
   - include_tasks: "{{ item }}"
     with_items: 
     - tasks/install_aem.yaml
-    - tasks/update_aem.yaml
     - tasks/configure_aem.yaml
+    - tasks/update_aem.yaml
   tags:
     - author
-
 
 - hosts: dispatcher
   vars_files:
