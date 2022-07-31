@@ -1,0 +1,23 @@
+---
+- hosts: all
+  become: true
+  vars_files:
+    - vars/default.yaml
+
+  tasks:
+    - name: Find AEM PID
+      shell: ps -ef | grep "p {{ aem_port }}" | head -1 | awk '{print $2}'
+      register: aem_pid
+
+    - name: Kill AEM gracefully
+      when: aem_pid.stdout_lines | length > 0 and graceful
+      command: "kill {{ aem_pid.stdout }}"
+
+    - name: Kill AEM ungracefully
+      when: aem_pid.stdout_lines | length > 0 and not graceful
+      command: "kill -9 {{ aem_pid.stdout }}"  
+      
+    - name: Wait until the instance is stopped
+      wait_for:
+        port: "{{ aem_port }}"
+        state: stopped

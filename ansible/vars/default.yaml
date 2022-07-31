@@ -1,0 +1,22 @@
+---
+aem_environment: prd
+aem_install_dir: "/opt/aem"
+aem_port: 4502
+aem_secure_port: 443
+aem_sp_version: 12
+aem_admin_password: admin
+aem_debug: true
+aem_debug_port: 8000
+
+dispatcher_archive_name: dispatcher-apache2.4-linux-x86_64-ssl1.1-4.3.5.tar.gz
+
+ssl_ca_password: ca123
+ssl_temp_dir: /tmp/aem-ssl
+ssl_ca_dir: /usr/local/share/ca-certificates
+ssl_ca_name: aem-ca
+
+# Set to 'true' if you'd like to update your host CAs to trust the containers (fixes
+# SSL errors in curl and Chrome for example). However, if 'true', you must use the 
+# --ask-become-pass flag when running ansible-playbook and you will be prompted for a
+# root password
+ssl_update_host_ca: false

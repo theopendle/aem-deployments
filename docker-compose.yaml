@@ -6,18 +6,42 @@ networks:
 
 services:
 
-  ansible-target:
-    image: ansible-target
-    build: ansible-target
-    container_name: ansible-target
+  author1:
+    image: ansible-base
+    build: ansible-base
+    container_name: author1
     networks:
       - playground
     ports:
-      - "6022:22"
-      - "6880:8080"
-      - "6080:80"
-      - "6443:443"
-    volumes:
-      - ./artifacts:/artifacts
+      - "6010:22"
+      - "6020:443"
+      - "6030:4502"
+      - "6040:8000"
     privileged: true
-    hostname: ansible-target
+    hostname: author1.aem.deployment
+
+  publish1:
+    image: ansible-base
+    build: ansible-base
+    container_name: publish1
+    networks:
+      - playground
+    ports:
+      - "6011:22"
+      - "6021:443"
+      - "6031:4502"
+    privileged: true
+    hostname: publish1.aem.deployment
+
+  dispatcher1:
+    image: ansible-base
+    build: ansible-base
+    container_name: dispatcher1
+    networks:
+      - playground
+    ports:
+      - "6012:22"
+      - "6022:443"
+      - "6032:80"
+    privileged: true
+    hostname: dispatcher1.aem.deployment

@@ -1,0 +1,7 @@
+---
+- name: Clear known_hosts
+  command: |
+    ssh-keygen -f "/home/{{ ansible_user_id }}/.ssh/known_hosts" -R "[127.0.0.1]:{{ hostvars[host]['ansible_port'] }}"
+
+- name: Add new ECDSA fingerprint
+  command: sshpass -p 'root' ssh -o StrictHostKeyChecking=no root@{{ host }} 'echo "ECDSA fingerprint added for $(hostname)"'

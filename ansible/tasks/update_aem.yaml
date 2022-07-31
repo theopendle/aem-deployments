@@ -1,0 +1,51 @@
+---
+  - name: Get product information
+    uri:
+      url: "http://localhost:{{ aem_port }}/system/console/productinfo"
+      user: admin
+      password: "{{ aem_admin_password }}"
+      force_basic_auth: yes
+      return_content: yes
+    register: product_info
+
+  - name: Fail if SP already installed
+    when: '"Adobe Experience Manager (6.5." + (aem_sp_version | string) in product_info.content'
+    fail:
+      msg: "SP {{ aem_sp_version }} already installed"
+
+  - name: Copy SP to install directory
+    copy:
+      src: proprietary/aem-service-pkg-6.5.{{ aem_sp_version }}.0.zip
+      dest: "{{ aem_install_dir }}/"
+    register: sp
+
+  - name: Upload Package
+    command: |
+      curl -u admin:{{ aem_admin_password }} \
+        -F force=true \
+        -F package=@'{{ sp.dest }}' \
+        http://localhost:{{ aem_port }}/crx/packmgr/service/.json/?cmd=upload
+    args:
+      warn: no
+    register: upload_status
+    failed_when: '"\"success\":true" not in upload_status.stdout'
+
+  - name: Install Package
+    uri:
+      url: http://localhost:{{ aem_port }}/crx/packmgr/service/.json{{ upload_status.stdout | regex_search('/etc.*\.zip')  }}?cmd=install
+      user: admin
+      password: "{{ aem_admin_password }}"
+      method: POST
+      body_format: form-urlencoded
+      return_content: true
+      body:
+        recursive: true
+        force: true
+    register: install_status
+    failed_when: '"\"success\":true" not in install_status.content'
+
+  - name: Wait until the SP installation is complete
+    wait_for:
+      path: "{{ aem_install_dir }}/crx-quickstart/logs/error.log"
+      search_regex: "{{ aem_sp_version }} Installed successfully"
+      timeout: 600

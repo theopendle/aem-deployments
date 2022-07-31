@@ -1,7 +1,0 @@
----
-- hosts: all
-  tasks:
-
-    - name: "Hello world from {{ ansible_host }}"
-      debug:
-        msg: "Hello world from {{ ansible_host }}"

@@ -1,0 +1,39 @@
+---
+
+- name: Configure SSL
+  command: |
+    curl -u admin:{{ aem_admin_password }} \
+    -F "keystorePassword={{ aem_admin_password }}" \
+    -F "keystorePasswordConfirm={{ aem_admin_password }}" \
+    -F "truststorePassword={{ aem_admin_password }}" \
+    -F "truststorePasswordConfirm={{ aem_admin_password }}" \
+    -F "privatekeyFile=@/etc/pki/tls/private/aem.der" \
+    -F "certificateFile=@/etc/pki/tls/certs/aem.crt" \
+    -F "httpsHostname={{ ansible_fqdn }}" \
+    -F "httpsPort={{ aem_secure_port }}" \
+    http://localhost:{{ aem_port }}/libs/granite/security/post/sslSetup.html
+  retries: 3
+  delay: 10
+  register: configure_ssl
+  until: configure_ssl.rc == 0
+
+- name: Check SSL connection
+  uri:
+    url: "https://{{ ansible_fqdn }}:{{ aem_secure_port }}/libs/granite/core/content/login.html"
+    status_code: 200
+    validate_certs: no
+
+- name: Disable WebDAV bundle
+  uri: 
+    url: http://localhost:{{ aem_port }}/system/console/bundles/org.apache.sling.jcr.webdav
+    user: admin
+    password: "{{ aem_admin_password }}"
+    force_basic_auth: true
+    method: POST
+    body_format: form-urlencoded
+    return_content: true
+    status_code: 
+      - 200
+      - 201
+    body:
+      action: stop

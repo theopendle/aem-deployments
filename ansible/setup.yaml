@@ -1,0 +1,69 @@
+---
+- hosts: localhost
+  vars_files:
+    - vars/default.yaml
+  tags:
+    - ssl
+  tasks:
+    - name: Create SSH aliases
+      blockinfile:
+        path: "/home/{{ ansible_user_id }}/.ssh/config"
+        marker: "# {mark} ANSIBLE MANAGED BLOCK"
+        block: |
+          {% for host in groups['all'] %}
+          Host {{ host }}
+            HostName 127.0.0.1
+            Port {{ hostvars[host]['ansible_port'] }}
+          
+          {% endfor %}
+
+    - name: Create DNS hosts
+      become: true
+      when: ssl_update_host_ca
+      blockinfile:
+        path: /etc/hosts
+        marker: "# {mark} ANSIBLE MANAGED BLOCK"
+        block: |
+          127.0.0.1 localhost{% for host in groups['all'] %} {{ host }}.aem.deployment{% endfor %}
+
+    - include_tasks: tasks/configure_ssh_hosts.yaml
+      loop: "{{ groups['all'] }}"
+      loop_control:
+        loop_var: host
+
+    - include_tasks: tasks/create_crypto_objects.yaml
+
+- hosts: author
+  vars_files:
+    - vars/default.yaml
+  tasks:
+  - include_tasks: "{{ item }}"
+    with_items: 
+    - tasks/install_aem.yaml
+    - tasks/configure_aem.yaml
+    - tasks/update_aem.yaml
+  tags:
+    - author
+
+- hosts: publish
+  vars_files:
+    - vars/default.yaml
+  tasks:
+  - include_tasks: "{{ item }}"
+    with_items: 
+    - tasks/install_aem.yaml
+    - tasks/configure_aem.yaml
+    - tasks/update_aem.yaml
+  tags:
+    - publish
+
+- hosts: dispatcher
+  vars_files:
+    - vars/default.yaml
+  tasks:
+  - include_tasks: "{{ item }}"
+    with_items: 
+    - tasks/install_dispatcher.yaml
+  tags:
+    - dispatcher
+  

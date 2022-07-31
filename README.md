@@ -1,55 +1,59 @@
-# ansible-playground
+# aem-deployments
 
-This project serves to create a minimal playground for writing and testing ansible playbooks.
+This project serves to create a examples for typical AEM deployments.
 
-## Architecture
+The project was built primarily using Ansible and Docker, based on the [ansible-playground project](https://github.com/theopendle/ansible-playground).
 
-![Architecure](./doc/architecture.png)
+## Deployments
 
-## How to use
+Each tag in this repo corresponds to one of the deployment architectures listed below. Click on the images to open the tag in question.
 
-### Run the environment
+### Simple
+[![simple](./doc/simple.png)]()
 
-Use the following commands to build and run the environment from scratch:
+This model is the cheapest to deploy and simplest to maintain, using the dispatcher for cacheing, security and load balancing. Disaster recovery on the Author instance would require a daily backup of the TarMK repository for a 24H RPO.
 
-```bash
-docker build ansible-base -t ansible-base && docker-compose kill; docker-compose rm -f && docker-compose build && docker-compose up -d
-```
+Additional documentation:
+* [Dispatcher: Legacy setup](https://experienceleague.adobe.com/docs/experience-manager-learn/dispatcher-tutorial/chapter-2.html%3Flang%3Dit#the-%E2%80%9Clegacy%E2%80%9D-setup)
+* [AEM: Single TarMK](https://experienceleague.adobe.com/docs/experience-manager-64/deploying/deploying/recommended-deploys.html?lang=en#single-tarmk-instance)
 
-### Create SSH aliases for the containers
 
-In order to connect to the containers via SSH (asnible requires this), you must first create an alias, like so:
+### Horizontally scaled
+[![horizontal](./doc/horizontal.png)]()
 
-```bash
-echo "
-# BEGIN: Added for ansible-playground
-Host ansible-target
-    HostName 127.0.0.1
-    Port 6022
-# END: Added for ansible-playground
-" > ~/.ssh/config
-```
+This model increases redundancy by duplicating the publish dispatchers and serving requests using a dedicated load-balancer. A cold-standy Author instance is also introduced for quick disaster recovery.
 
-Now connect to the container(s) for the first time to load their ECDSA fingerprint using credentials `root:root`, like so:
+Additional documentation:
+* [Dispatcher: Multi-legged setup](https://experienceleague.adobe.com/docs/experience-manager-learn/dispatcher-tutorial/chapter-2.html%3Flang%3Dit#multi-legged-setup)
+* [AEM: Cold Standby TarMK](https://experienceleague.adobe.com/docs/experience-manager-64/deploying/deploying/recommended-deploys.html?lang=en#tarmk-cold-standby)
 
-```bash
-ssh root@ansible-target
-```
 
-### Create ansible hosts for the containers
+## Run the deployment
 
-Now declare the containers as hosts to ansible, like so:
-```bash
-echo "
-# BEGIN: Added for ansible-playground
-ansible-target   ansible_host=ansible-target      ansible_port=6022   ansible_user=root   ansible_password=root
-# END: Added for ansible-playground
-" > /etc/ansible/hosts
-```
+> :warning: **Requires local setup**: This project was developed on a Debian Linux system. It requires ansible version v2.9+ to be installed on the host machine. 
 
-### Execute a playbook
+Due to the proprietary nature of the AEM platform, the fully configured instances cannot be a part of this open-source project (ie: there is no Adobe proprierary software in the images of the containers or this repo in general). For that reason, `docker` is used to create essentially empty containers and then `ansible` is used to do all the AEM-specific configuration. 
 
-You can now execute a playbook on your container, like so:
-```bash
-ansible-playbook --limit ansible-target playbooks/hello_world.yaml
-```
+1. If you havent already, install:
+    * [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+    * [Docker](https://docs.docker.com/get-docker/)
+
+2. Download the following Adobe software and place them in the `ansible/files/proprietary` folder:
+    * The cq-quickstart JAR from the [Adobe Software Distribution website](https://experience.adobe.com/#/downloads/content/software-distribution/en/aem.html) (eg: `cq-quickstart-6.5.0.jar`)
+    * The latest AEM Service Pack from the [Adobe Software Distribution website](https://experience.adobe.com/#/downloads/content/software-distribution/en/aem.html)(eg: `aem-service-pkg-6.5.12.0.zip`)
+    * The dispatcher module TAR from the [Dispatcher download page](https://experienceleague.adobe.com/docs/experience-manager-dispatcher/using/getting-started/release-notes.html?lang=en#downloads) (eg: `dispatcher-apache2.4-linux-x86_64-ssl1.1-4.3.5.tar.gz`)
+
+3. Copy your `license.properties` file in the `ansible/files` folder
+
+4. Build the container image(s) and run the containers using the following command:
+    ```bash
+    docker build ansible-base -t ansible-base && docker-compose kill; docker-compose rm -f && docker-compose build && docker-compose up -d
+    ```
+
+5. Check the variables declared in the `ansible/vars/default.yaml` file. You can change them there if necessary, or [override them on the command-line](https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#defining-variables-at-runtime) in the next step using `--extra-vars`.
+
+6. Run setup of the environment with the following command:
+    ```bash
+    ansible-playbook ansible/setup.yaml -v -i ansible/hosts.yaml
+    ```
+    > :warning: **Takes a bit of time**: Since the playbook is responsible for setting up the entire AEM deployment and config, it is normal for it to run for a few minutes, depending on your machine specs.

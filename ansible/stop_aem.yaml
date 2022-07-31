@@ -1,0 +1,16 @@
+---
+- hosts: all
+  become: true
+  vars_files:
+    - vars/default.yaml
+
+  tasks:
+    - name: Stop AEM
+      service:
+        name: aem
+        state: stopped
+
+    - name: Wait until the instance is stopped
+      wait_for:
+        port: "{{ aem_port }}"
+        state: stopped

@@ -1,0 +1,95 @@
+---
+
+- name: Install Java
+  yum:
+    name: java-11-openjdk
+    state: present
+
+- include: create_npa.yaml
+  vars:
+    npa_user_name: aem
+    npa_user_start_dir: "{{ aem_install_dir }}"
+
+- name: Create install directory
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: aem
+    group: aem
+  with_items:
+    - "{{ aem_install_dir }}"
+    - "{{ aem_install_dir }}/tmp"
+
+- become: true
+  become_user: aem
+  block: 
+
+    - name: "Create log reading function"
+      blockinfile:
+        path: "~/.bashrc"
+        marker: "###### {mark} AEM functions ######"
+        block: |
+          # Tails an AEM instance log
+          function aemlog() {
+            tail -f "/opt/aem/crx-quickstart/logs/${1}.log"
+          }
+
+    - name: Copy quickstart JAR to install directory
+      copy:
+        src: proprietary/cq-quickstart-6.5.0.jar
+        dest: "{{ aem_install_dir }}/"
+
+    - name: Copy license file to install directory
+      copy:
+        src: proprietary/license.properties
+        dest: "{{ aem_install_dir }}/"
+
+    - name: Create symlink for AEM JAR
+      file: 
+        src: "{{ aem_install_dir }}/cq-quickstart-6.5.0.jar"
+        dest: "{{ aem_install_dir }}/aem.jar"
+        state: link
+      register: aem_jar
+
+    - name: Check if JAR has already been unpacked
+      stat: 
+        path: "{{ aem_install_dir }}/crx-quickstart"
+      register: crx_quickstart
+
+    - name: Unpack AEM JAR
+      when: not crx_quickstart.stat.exists
+      shell: | 
+          java \
+            -Xmx4096M \
+            -jar {{ aem_jar.dest }} \
+            -unpack \
+            -nobrowser \
+            -nointeractive \
+            -p {{ aem_port }} \
+            -Djava.io.tmpdir="{{ aem_install_dir }}/tmp" \
+            -Dsling.run.modes={{ aem_mode }},{{ aem_environment }},nosamplecontent
+      args:
+        chdir: "{{ aem_install_dir }}"
+      async: 45
+      poll: 0
+
+    - include: create_aem_service.yaml
+
+- name: Start AEM
+  service:
+    name: aem
+    state: started
+    enabled: true
+
+- name: Wait until the instance is started
+  wait_for:
+    port: "{{ aem_port }}"
+
+- name: Wait until the installation is complete
+  uri:
+    url: "http://localhost:{{ aem_port }}/libs/granite/core/content/login.html"
+    status_code: 200
+  register: result
+  until: result.status == 200
+  retries: 60
+  delay: 10
