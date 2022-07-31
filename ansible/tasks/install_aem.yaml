@@ -24,6 +24,16 @@
   become_user: aem
   block: 
 
+    - name: "Create log reading function"
+      blockinfile:
+        path: "~/.bashrc"
+        marker: "###### {mark} AEM functions ######"
+        block: |
+          # Tails an AEM instance log
+          function aemlog() {
+            tail -f "/opt/aem/crx-quickstart/logs/${1}.log"
+          }
+
     - name: Copy quickstart JAR to install directory
       copy:
         src: proprietary/cq-quickstart-6.5.0.jar
