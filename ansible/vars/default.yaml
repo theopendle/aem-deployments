@@ -7,6 +7,7 @@ aem_sp_version: 13
 aem_admin_password: admin
 aem_debug: true
 aem_debug_port: 8000
+aem_enable_crxde: true
 
 dispatcher_archive_name: dispatcher-apache2.4-linux-x86_64-ssl1.1-4.3.5.tar.gz
 
