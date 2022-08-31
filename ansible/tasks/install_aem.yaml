@@ -79,7 +79,7 @@
   service:
     name: aem
     state: started
-    enabled: true
+    # enabled: true
 
 - name: Wait until the instance is started
   wait_for:

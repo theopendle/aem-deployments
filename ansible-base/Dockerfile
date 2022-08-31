@@ -1,4 +1,4 @@
-FROM centos:7
+FROM centos:8
 
 USER root
 
@@ -13,6 +13,10 @@ rm -f /lib/systemd/system/sockets.target.wants/*udev*; \
 rm -f /lib/systemd/system/sockets.target.wants/*initctl*; \
 rm -f /lib/systemd/system/basic.target.wants/*;\
 rm -f /lib/systemd/system/anaconda.target.wants/*;
+
+# Use base URLs
+RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+RUN sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
 
 # Install basics
 RUN echo "root:root" | chpasswd && \
@@ -30,4 +34,20 @@ RUN useradd -ms /bin/bash ansible && \
     echo "ansible:ansible" | chpasswd && \
     echo "ansible ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/ansible
 
+# Install python
+RUN yum -y install python3 python3-pip
+RUN python3 -m pip install --upgrade pip
+
+# Install ansible
+USER ansible
+
+RUN python3 -m pip install --user ansible
+RUN python3 -m pip install --upgrade --user ansible
+
+USER root
+
+# Install AEM pre-requisites
+RUN yum -y install java-11-openjdk httpd
+
+# VOLUME [ "/sys/fs/cgroup" ]
 CMD ["/usr/sbin/init"]

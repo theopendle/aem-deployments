@@ -37,6 +37,7 @@
       password: "{{ aem_admin_password }}"
       method: POST
       body_format: form-urlencoded
+      force_basic_auth: yes
       return_content: true
       body:
         recursive: true

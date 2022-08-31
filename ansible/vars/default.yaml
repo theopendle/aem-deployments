@@ -3,7 +3,7 @@ aem_environment: prd
 aem_install_dir: "/opt/aem"
 aem_port: 4502
 aem_secure_port: 443
-aem_sp_version: 12
+aem_sp_version: 13
 aem_admin_password: admin
 aem_debug: true
 aem_debug_port: 8000

@@ -17,6 +17,8 @@ services:
       - "6020:443"
       - "6030:4502"
       - "6040:8000"
+    volumes:
+      - ./ansible:/home/ansible/ansible:ro
     privileged: true
     hostname: author1.aem.deployment
 
@@ -30,6 +32,8 @@ services:
       - "6011:22"
       - "6021:443"
       - "6031:4502"
+    volumes:
+      - ./ansible:/home/ansible/ansible:ro
     privileged: true
     hostname: publish1.aem.deployment
 
@@ -43,5 +47,7 @@ services:
       - "6012:22"
       - "6022:443"
       - "6032:80"
+    volumes:
+      - ./ansible:/home/ansible/ansible:ro
     privileged: true
     hostname: dispatcher1.aem.deployment
