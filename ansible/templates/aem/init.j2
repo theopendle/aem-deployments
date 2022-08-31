@@ -17,7 +17,6 @@ STATUS=${BIN}/status
 export CQ_RUNMODE='{{ aem_mode }},{{ aem_environment}},nosamplecontent'
 
 # Set CQ options
-export CQ_HOST="localhost"
 export CQ_PORT={{ aem_port }}
 export CQ_JVM_OPTS="-server -Xmx4096m -Djava.awt.headless=true {% if aem_debug %}-agentlib:jdwp=transport=dt_socket,address=*:8000{% endif %},server=y,suspend=n -Djdk.tls.ephemeralDHKeySize=2048 -Djava.io.tmpdir=${AEM_ROOT}/tmp"
 
